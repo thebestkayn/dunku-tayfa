@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Kayıt Ol — Dünkü Tayfa Vadisi</title>
+    <style>
+        :root {
+            --bg: #0f3236;
+            --card: #ffffff;
+            --text: #1f2a33;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #0ea5e9;
+            --accent-pressed: #0b8ac4;
+            --ok: #16a34a;
+            --err: #dc2626;
+            --radius: 14px;
+            --shadow: 0 8px 30px rgba(2, 6, 23, 0.15);
+            --focus: 0 0 0 3px rgba(14, 165, 233, .35);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card: #0b1b1e;
+                --text: #e6edf3;
+                --muted: #a3b3c3;
+                --border: #18343a;
+                --shadow: 0 8px 30px rgba(0, 0, 0, .45);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+            color: var(--text);
+            -webkit-text-size-adjust: 100%;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            min-height: 100dvh;
+            background:
+                radial-gradient(1200px 800px at 10% -20%, #195159 0%, transparent 60%),
+                radial-gradient(1000px 600px at 120% 120%, #0b3a40 0%, transparent 60%),
+                var(--bg);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 1120px;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 32px;
+            align-items: center;
+        }
+
+        @media (max-width:920px) {
+            .wrap {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .brand {
+            color: #fff;
+            padding: 24px;
+            border-radius: var(--radius);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .04)),
+                rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(6px);
+        }
+
+        .brand h1 {
+            margin: 0 0 10px;
+            font-size: clamp(28px, 4vw, 44px);
+            letter-spacing: .2px;
+        }
+
+        .brand p {
+            margin: 0 0 16px;
+            max-width: 52ch;
+            color: rgba(255, 255, 255, .9);
+            line-height: 1.5;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .card header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .card header h2 {
+            margin: 0 0 6px;
+            font-size: 22px;
+            letter-spacing: .2px;
+        }
+
+        .card header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .group {
+            margin-top: 14px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: inherit;
+            transition: box-shadow .15s ease, border-color .15s ease;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(100, 116, 139, .7);
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: var(--focus);
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .toggle-pass {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            font: inherit;
+            color: var(--muted);
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .toggle-pass:focus-visible {
+            outline: none;
+            box-shadow: var(--focus);
+        }
+
+        .hint {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .hint.error {
+            color: var(--err);
+        }
+
+        .hint.ok {
+            color: var(--ok);
+        }
+
+        .strength {
+            margin-top: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .strength>span {
+            display: block;
+            height: 100%;
+            width: 0%;
+            transition: width .25s ease;
+        }
+
+        .strength--weak>span {
+            width: 33%;
+            background: #f87171;
+        }
+
+        /* kırmızı */
+        .strength--mid>span {
+            width: 66%;
+            background: #fbbf24;
+        }
+
+        /* sarı */
+        .strength--good>span {
+            width: 100%;
+            background: #34d399;
+        }
+
+        /* yeşil */
+
+        .actions {
+            margin-top: 18px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .06s ease, background .15s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent-pressed);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn[disabled] {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+        .status {
+            min-height: 22px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .status.error {
+            color: var(--err);
+        }
+
+        .status.ok {
+            color: var(--ok);
+        }
+
+        .alt {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .alt a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .alt a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap">
+        <section class="brand" aria-label="Proje tanıtımı">
+            <h1>Dünkü Tayfa Vadisi</h1>
+            <p>Arkadaş grubumuzun fotoğraf albümü: anılar, paylaşımlar ve küçük notlar. Hızlı bir kayıtla dahil ol.</p>
+        </section>
+
+        <section class="card" aria-labelledby="form-title">
+            <header>
+                <h2 id="form-title">Kayıt Ol</h2>
+                <p>Zaten hesabın var mı? <a href="DunkuTayfa.html">Giriş yap</a></p>
+            </header>
+
+            <form id="registerForm" novalidate>
+                <div class="group">
+                    <label for="username">Kullanıcı Adı</label>
+                    <input id="username" name="username" type="text" placeholder="takma_ad" required minlength="2"
+                        maxlength="24" autocomplete="nickname" />
+                    <div class="hint" id="userHint">2–24 karakter, boşluk yok.</div>
+                </div>
+
+                <div class="group">
+                    <label for="email">E-posta</label>
+                    <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
+                        placeholder="ornek@posta.com" required />
+                    <div class="hint error" id="emailHint" hidden>Lütfen geçerli bir e-posta gir.</div>
+                </div>
+
+                <div class="group password-wrap">
+                    <label for="password">Şifre</label>
+                    <input id="password" name="password" type="password" autocomplete="new-password" minlength="6"
+                        placeholder="en az 6 karakter" required />
+                    <button class="toggle-pass" type="button" id="togglePass" aria-controls="password"
+                        aria-pressed="false">Göster</button>
+                    <div class="strength" id="strengthBar" aria-hidden="true"><span></span></div>
+                    <div class="hint" id="pwdHint">En az 6 karakter. Büyük/küçük harf, rakam ve sembol kullanman
+                        önerilir.</div>
+                </div>
+
+                <div class="group">
+                    <label for="confirm">Şifre (Tekrar)</label>
+                    <input id="confirm" name="confirm" type="password" autocomplete="new-password"
+                        placeholder="şifreni tekrar yaz" required />
+                    <div class="hint error" id="matchHint" hidden>Şifreler eşleşmiyor.</div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn" type="submit" id="submitBtn">Kayıt Ol</button>
+                    <div class="status" id="status" aria-live="polite"></div>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // Projendeki mevcut değerler
+        const supabaseUrl = 'https://dsrmfijgzzktlvjlkytc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzcm1maWpnenprdGx2amxreXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MDE3NjAsImV4cCI6MjA2OTQ3Nzc2MH0.PRj-jRw3bZls-IbokmJtQYpAXXam_Ygtk7n4q8tmqwc';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const form = document.getElementById('registerForm');
+        const btn = document.getElementById('submitBtn');
+        const statusEl = document.getElementById('status');
+
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirm = document.getElementById('confirm');
+
+        const emailHint = document.getElementById('emailHint');
+        const matchHint = document.getElementById('matchHint');
+        const strengthBar = document.getElementById('strengthBar');
+        const togglePass = document.getElementById('togglePass');
+
+        // Şifre göster/gizle
+        togglePass.addEventListener('click', () => {
+            const showing = password.type === 'text';
+            password.type = showing ? 'password' : 'text';
+            togglePass.setAttribute('aria-pressed', String(!showing));
+            togglePass.textContent = showing ? 'Göster' : 'Gizle';
+            password.focus({ preventScroll: true });
+        });
+
+        // Basit e-posta kontrolü
+        function isEmail(v) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        }
+
+        // Şifre gücü (zayıf/orta/güçlü)
+        function strength(v) {
+            let score = 0;
+            if (v.length >= 6) score++;
+            if (/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+            if (/\d/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            if (v.length >= 10) score++;
+            if (score <= 2) return 'weak';
+            if (score === 3 || score === 4) return 'mid';
+            return 'good';
+        }
+
+        function updateStrength() {
+            const val = password.value;
+            strengthBar.classList.remove('strength--weak', 'strength--mid', 'strength--good');
+            if (!val) {
+                strengthBar.setAttribute('aria-hidden', 'true');
+                return;
+            }
+            strengthBar.removeAttribute('aria-hidden');
+            const s = strength(val);
+            if (s === 'weak') strengthBar.classList.add('strength--weak');
+            if (s === 'mid') strengthBar.classList.add('strength--mid');
+            if (s === 'good') strengthBar.classList.add('strength--good');
+        }
+
+        // Canlı kontroller
+        email.addEventListener('input', () => {
+            const ok = isEmail(email.value.trim());
+            emailHint.hidden = ok || !email.value;
+        });
+        password.addEventListener('input', () => {
+            updateStrength();
+            if (confirm.value) {
+                matchHint.hidden = password.value === confirm.value;
+            }
+        });
+        confirm.addEventListener('input', () => {
+            matchHint.hidden = password.value === confirm.value;
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            statusEl.textContent = '';
+            emailHint.hidden = isEmail(email.value.trim()) || !email.value;
+            matchHint.hidden = password.value === confirm.value;
+
+            // zorunlu alan ve basit validasyon
+            if (!username.value.trim() || !email.value.trim() || !password.value || !confirm.value) {
+                statusEl.textContent = 'Lütfen tüm alanları doldurun.';
+                statusEl.className = 'status error';
+                return;
+            }
+            if (!isEmail(email.value.trim())) {
+                statusEl.textContent = 'E-posta biçimi hatalı.';
+                statusEl.className = 'status error';
+                return;
+            }
+            if (password.value.length < 6) {
+                statusEl.textContent = 'Şifre en az 6 karakter olmalı.';
+                statusEl.className = 'status error';
+                return;
+            }
+            if (password.value !== confirm.value) {
+                statusEl.textContent = 'Şifreler eşleşmiyor.';
+                statusEl.className = 'status error';
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Kaydediliyor…';
+
+                // Supabase signUp
+                const { data, error } = await supabase.auth.signUp({
+                    email: email.value.trim(),
+                    password: password.value
+                });
+
+                if (error) {
+                    statusEl.textContent = 'Kayıt başarısız: ' + error.message;
+                    statusEl.className = 'status error';
+                    return;
+                }
+
+                const userId = data?.user?.id;
+
+                // profiles tablosuna yaz (varsa)
+                if (userId) {
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([{ id: userId, username: username.value.trim(), email: email.value.trim() }]);
+                    if (profileError) {
+                        console.warn('profiles insert hatası:', profileError.message);
+                    }
+                }
+
+                statusEl.textContent = 'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz…';
+                statusEl.className = 'status ok';
+                // kısa bir gecikme ile yönlendir
+                setTimeout(() => { window.location.href = 'DunkuTayfa.html'; }, 800);
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.';
+                statusEl.className = 'status error';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Kayıt Ol';
+            }
+        });
+
+        // ilk yüklemede barı sıfırla
+        updateStrength();
+    </script>
+</body>
+
+</html>

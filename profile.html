@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Profilim — Dünkü Tayfa Vadisi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <style>
+        :root {
+            --bg: #0f3236;
+            --card: #ffffff;
+            --text: #1f2a33;
+            --muted: #475569;
+            --border: #e2e8f0;
+            --accent: #0ea5e9;
+            --accent-pressed: #0b8ac4;
+            --ok: #16a34a;
+            --err: #dc2626;
+            --radius: 14px;
+            --shadow: 0 8px 30px rgba(2, 6, 23, 0.15);
+            --focus: 0 0 0 3px rgba(14, 165, 233, .35);
+            --sidebar-w: 260px;
+
+            --comment-bg: #f8fafc;
+            --badge-bg: #eef2ff;
+            --badge-text: #1e293b;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card: #0b1b1e;
+                --text: #e6edf3;
+                --muted: #a3b3c3;
+                --border: #18343a;
+                --shadow: 0 8px 30px rgba(0, 0, 0, .45);
+                --comment-bg: #0f1d20;
+                --badge-bg: #0f1d20;
+                --badge-text: #cbd5e1;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100dvh;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+            color: var(--text);
+            background:
+                radial-gradient(1200px 800px at 10% -20%, #195159 0%, transparent 60%),
+                radial-gradient(1000px 600px at 120% 120%, #0b3a40 0%, transparent 60%),
+                var(--bg);
+        }
+
+        /* ==== Sidebar ==== */
+        .sidebar {
+            position: fixed;
+            inset: auto auto 0 0;
+            top: 0;
+            width: var(--sidebar-w);
+            height: 100dvh;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .04)), rgba(255, 255, 255, .04);
+            border-right: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            transform: translateX(0);
+            transition: transform .25s ease;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .12);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .brand .title {
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .brand .subtitle {
+            margin: 2px 0 0;
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .profile-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 8px;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            flex: 0 0 36px;
+        }
+
+        .me {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .me .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .me .mail {
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .nav {
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid transparent;
+            transition: background .15s ease, transform .06s ease;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, .08);
+            transform: translateY(1px);
+        }
+
+        .nav a.active {
+            background: rgba(255, 255, 255, .14);
+            border-color: rgba(255, 255, 255, .22);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .signout-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .signout-btn:hover {
+            background: rgba(255, 255, 255, .14);
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 60;
+            border: 1px solid rgba(255, 255, 255, .3);
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+            backdrop-filter: blur(6px);
+        }
+
+        @media (max-width: 960px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* ==== Content ==== */
+        .content {
+            margin-left: var(--sidebar-w);
+            padding: 24px;
+            min-height: 100dvh;
+        }
+
+        @media (max-width: 960px) {
+            .content {
+                margin-left: 0;
+                padding-top: 64px;
+            }
+        }
+
+        h1.page-title {
+            margin: 0 0 16px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+            font-size: clamp(22px, 4vw, 32px);
+        }
+
+        /* ==== Cards ==== */
+        .card,
+        .album {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+            max-width: 980px;
+            margin: 0 auto 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Avatar alanı */
+        .avatar-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .avatar-img,
+        .avatar-fallback {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #666;
+        }
+
+        .avatar-tools {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .error {
+            color: var(--err);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        input[type="text"] {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: inherit;
+            transition: box-shadow .15s ease, border-color .15s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: var(--focus);
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-edit {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+        .btn-save {
+            background: #198754;
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: #fff;
+        }
+
+        .del-btn {
+            background: #dc3545;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .del-btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* ==== Album ==== */
+        .album h3 {
+            margin: 0 0 12px;
+        }
+
+        #loading {
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .album-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--comment-bg);
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(2, 6, 23, .08);
+        }
+
+        .album-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .caption {
+            padding: 10px;
+            font-weight: 700;
+        }
+
+        .album-card .actions {
+            padding: 0 10px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            font-size: 13px;
+            border: 1px solid var(--border);
+        }
+
+        /* ==== CROP MODAL ==== */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 720px;
+            padding: 16px;
+        }
+
+        .modal h3 {
+            margin: 0 0 6px;
+        }
+
+        .crop-wrap {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            place-items: center;
+            padding: 10px;
+        }
+
+        .cropper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border-radius: 12px;
+            background: #111;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .cropper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            user-select: none;
+            -webkit-user-drag: none;
+            image-rendering: auto;
+        }
+
+        .mask {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at center, transparent 49%, rgba(0, 0, 0, .5) 51%),
+                linear-gradient(transparent, transparent);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+            padding: 8px 4px 0;
+            flex-wrap: wrap;
+        }
+
+        .controls .range {
+            width: 220px;
+        }
+
+        .controls .btn {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile hamburger -->
+    <button class="menu-toggle" id="menuToggle" aria-controls="sidebar" aria-expanded="false">☰ Menü</button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar" aria-label="Yan menü">
+        <div class="brand">
+            <div class="logo">DT</div>
+            <div>
+                <h2 class="title">Dünkü Tayfa</h2>
+                <div class="subtitle">Vadisi</div>
+            </div>
+        </div>
+
+        <div class="profile-head" id="profileBox" hidden>
+            <img id="meAvatar" class="avatar" alt="" />
+            <div class="me">
+                <span id="meName" class="name">Kullanıcı</span>
+                <span id="meMail" class="mail"></span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <a href="AnaSayfa.html">🏠 Ana Sayfa</a>
+            <a href="upload.html">📤 Fotoğraf Yükle</a>
+            <a href="profile.html">👤 Profilim</a>
+            <a href="prita.html">🔄 Prita</a>
+        </nav>
+
+        <div class="spacer"></div>
+        <button id="signOut" class="signout-btn">Çıkış Yap</button>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+        <h1 class="page-title">Profilim</h1>
+
+        <!-- Profile card -->
+        <section class="card">
+            <div class="grid">
+                <!-- Avatar bloğu -->
+                <div>
+                    <div class="row avatar-box">
+                        <img id="avatar-img" class="avatar-img" src="" alt="Avatar" style="display:none;">
+                        <div id="avatar-fallback" class="avatar-fallback">?</div>
+                        <div>
+                            <div class="avatar-tools">
+                                <input id="avatar-input" type="file" accept="image/*">
+                                <button id="avatar-save" class="btn btn-save">Kırp & Yükle</button>
+                                <button id="avatar-remove" class="btn btn-cancel">Kaldır</button>
+                            </div>
+                            <div id="avatar-msg" class="hint"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kullanıcı bilgileri -->
+                <div>
+                    <div class="user-info">
+                        <div class="row" style="margin-top:6px;">
+                            <p style="margin:0"><strong>Kullanıcı Adı:</strong> <span id="user-username"></span></p>
+                            <input id="username-input" type="text" style="display:none" maxlength="30"
+                                placeholder="yeni kullanıcı adı" />
+                            <button id="btn-edit" class="btn btn-edit">Düzenle</button>
+                            <button id="btn-save" class="btn btn-save" style="display:none">Kaydet</button>
+                            <button id="btn-cancel" class="btn btn-cancel" style="display:none">Vazgeç</button>
+                        </div>
+                        <div class="row">
+                            <span id="username-hint" class="hint"></span>
+                        </div>
+                        <div id="username-error" class="error" style="display:none"></div>
+                        <p style="margin:.5rem 0 0"><strong>Email:</strong> <span id="user-email"></span></p>
+                        <p style="margin:.25rem 0 0"><strong>Kullanıcı ID:</strong> <span id="user-id"></span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- My photos -->
+        <section class="album">
+            <h3>Yüklediğin Fotoğraflar</h3>
+            <div id="loading">Yükleniyor...</div>
+            <div class="album-grid" id="album-grid"></div>
+        </section>
+    </main>
+
+    <!-- ==== CROP MODAL ==== -->
+    <div id="cropModal" class="modal" aria-hidden="true">
+        <div class="modal-card">
+            <h3>Avatarı Kırp</h3>
+            <div class="crop-wrap">
+                <div id="cropper" class="cropper" aria-label="Kırpma alanı">
+                    <img id="cropImg" alt="Kırpılacak görsel">
+                    <div class="mask" aria-hidden="true"></div>
+                </div>
+                <div class="controls">
+                    <button id="cropCancel" class="btn btn-cancel" type="button">İptal</button>
+                    <input id="zoomRange" class="range" type="range" min="0.5" max="3" step="0.01" value="1"
+                        aria-label="Yakınlaştır">
+                    <button id="cropConfirm" class="btn btn-save" type="button">Kırp & Yükle</button>
+                </div>
+                <div class="hint">İpucu: Görseli sürükleyerek konumlandırabilir, farenin tekeriyle veya kaydırıcıyla
+                    yakınlaştırabilirsin.</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const supabase = createClient(
+            'https://dsrmfijgzzktlvjlkytc.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzcm1maWpnenprdGx2amxreXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MDE3NjAsImV4cCI6MjA2OTQ3Nzc2MH0.PRj-jRw3bZls-IbokmJtQYpAXXam_Ygtk7n4q8tmqwc'
+        );
+
+        // Sidebar state + active link + çıkış
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('menuToggle');
+        toggleBtn?.addEventListener('click', () => {
+            const open = sidebar.classList.toggle('open');
+            toggleBtn.setAttribute('aria-expanded', String(open));
+        });
+        const here = location.pathname.split('/').pop() || 'profile.html';
+        document.querySelectorAll('.nav a').forEach(a => {
+            if (a.getAttribute('href') === here) a.classList.add('active');
+            a.addEventListener('click', () => sidebar.classList.remove('open'));
+        });
+        document.getElementById('signOut')?.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            location.href = 'DunkuTayfa.html';
+        });
+
+        // === DOM refs ===
+        const usernameEl = document.getElementById('user-username');
+        const emailEl = document.getElementById('user-email');
+        const idEl = document.getElementById('user-id');
+        const grid = document.getElementById('album-grid');
+        const loadingEl = document.getElementById('loading');
+
+        // uploads bucket (public URL -> path)
+        function storagePathFromPublicUrlUploads(publicUrl) {
+            const m = publicUrl?.match(/\/object\/public\/uploads\/(.+)$/);
+            return m ? m[1] : null;
+        }
+        // avatars bucket (public URL -> path)
+        function storagePathFromPublicUrlAvatars(publicUrl) {
+            const m = publicUrl?.match(/\/object\/public\/avatars\/(.+)$/);
+            return m ? m[1] : null;
+        }
+
+        async function deletePhotoFromStorage(publicUrl) {
+            const path = storagePathFromPublicUrlUploads(publicUrl);
+            if (!path) return { error: new Error('Dosya yolu çözülemedi') };
+            const { error } = await supabase.storage.from('uploads').remove([path]);
+            return { error };
+        }
+
+        async function deletePhoto(photo) {
+            if (!confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) return;
+            const { error: stErr } = await deletePhotoFromStorage(photo.image_url);
+            if (stErr) console.warn('Storage silme uyarısı:', stErr.message);
+            const { error: dbErr } = await supabase.from('photo_metadata').delete().eq('id', photo.id);
+            if (dbErr) alert('Veritabanı silme hatası: ' + dbErr.message);
+            else document.getElementById(`photo-${photo.id}`)?.remove();
+        }
+
+        // ===== Avatar DOM ve yardımcılar =====
+        const avatarImg = document.getElementById('avatar-img');
+        const avatarFallback = document.getElementById('avatar-fallback');
+        const avatarInput = document.getElementById('avatar-input');
+        const avatarSaveBtn = document.getElementById('avatar-save');
+        const avatarRemoveBtn = document.getElementById('avatar-remove');
+        const avatarMsg = document.getElementById('avatar-msg');
+
+        function setAvatarUI(url, initials = '?') {
+            if (url) {
+                avatarImg.src = url; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none';
+            } else {
+                avatarImg.style.display = 'none'; avatarFallback.style.display = 'flex'; avatarFallback.textContent = initials || '?';
+            }
+        }
+        function getInitialsFromUsername(name) {
+            if (!name) return '?';
+            const parts = name.split(/\s+/).filter(Boolean);
+            const a = parts[0]?.[0] || '';
+            const b = (parts[1]?.[0]) || '';
+            return (a + b).toUpperCase() || a.toUpperCase() || '?';
+        }
+        function uiBusy(on) {
+            avatarSaveBtn.disabled = on;
+            avatarRemoveBtn.disabled = on;
+            avatarInput.disabled = on;
+        }
+
+        // ===== Kullanıcı adı düzenleme =====
+        const input = document.getElementById('username-input');
+        const editBtn = document.getElementById('btn-edit');
+        const saveBtn = document.getElementById('btn-save');
+        const cancelBtn = document.getElementById('btn-cancel');
+        const hintEl = document.getElementById('username-hint');
+        const errEl = document.getElementById('username-error');
+
+        function show(el) { el.style.display = 'inline-block'; }
+        function hide(el) { el.style.display = 'none'; }
+        function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
+        function clearErr() { errEl.textContent = ''; errEl.style.display = 'none'; }
+        function validateUsername(u) { return /^[a-zA-Z][a-zA-Z0-9_]{2,29}$/.test(u); }
+        function formatDateTR(d) { return new Date(d).toLocaleString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' }); }
+
+        // ===== CROP TOOL STATE =====
+        const cropModal = document.getElementById('cropModal');
+        const cropper = document.getElementById('cropper');
+        const cropImg = document.getElementById('cropImg');
+        const zoomRange = document.getElementById('zoomRange');
+        const cropCancel = document.getElementById('cropCancel');
+        const cropConfirm = document.getElementById('cropConfirm');
+
+        let imgFile = null;
+        let imgNatW = 0, imgNatH = 0;
+        let scale = 1, minScale = 1, maxScale = 3;
+        let tx = 0, ty = 0; // translate
+        let isDrag = false, lastX = 0, lastY = 0;
+
+        // === GLOBAL profil durumları (uploadAvatarBlob için) ===
+        let oldAvatarUrl = null;
+        let currentUsername = '';
+
+        function openCropper(file) {
+            imgFile = file;
+            const r = new FileReader();
+            r.onload = () => {
+                cropImg.src = r.result;
+                cropImg.onload = () => {
+                    const C = 280;
+                    minScale = Math.max(C / cropImg.naturalWidth, C / cropImg.naturalHeight);
+                    scale = Math.max(minScale, 1);
+                    maxScale = Math.max(3, minScale * 2.5);
+                    zoomRange.min = minScale.toFixed(2);
+                    zoomRange.max = maxScale.toFixed(2);
+                    zoomRange.value = scale.toFixed(2);
+                    tx = (C - cropImg.naturalWidth * scale) / 2;
+                    ty = (C - cropImg.naturalHeight * scale) / 2;
+                    applyTransform();
+                    cropModal.classList.add('open');
+                    cropModal.setAttribute('aria-hidden', 'false');
+                };
+            };
+            r.readAsDataURL(file);
+        }
+
+        function applyTransform() { cropImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
+
+        // drag/touch drag
+        cropper.addEventListener('mousedown', (e) => { isDrag = true; lastX = e.clientX; lastY = e.clientY; });
+        window.addEventListener('mouseup', () => { isDrag = false; });
+        window.addEventListener('mousemove', (e) => { if (!isDrag) return; const dx = e.clientX - lastX, dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY; tx += dx; ty += dy; applyTransform(); });
+        cropper.addEventListener('touchstart', (e) => { isDrag = true; const t = e.touches[0]; lastX = t.clientX; lastY = t.clientY; }, { passive: false });
+        cropper.addEventListener('touchmove', (e) => { if (!isDrag) return; const t = e.touches[0]; const dx = t.clientX - lastX; const dy = t.clientY - lastY; lastX = t.clientX; lastY = t.clientY; tx += dx; ty += dy; applyTransform(); e.preventDefault(); }, { passive: false });
+        cropper.addEventListener('touchend', () => { isDrag = false; });
+
+        // wheel zoom
+        cropper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.05 : 0.95;
+            const newScale = Math.min(maxScale, Math.max(minScale, scale * factor));
+            if (newScale === scale) return;
+            const rect = cropper.getBoundingClientRect();
+            const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+            const sx = (cx - tx) / scale, sy = (cy - ty) / scale;
+            tx = cx - sx * newScale; ty = cy - sy * newScale;
+            scale = newScale; zoomRange.value = scale.toFixed(2); applyTransform();
+        }, { passive: false });
+
+        // range zoom
+        zoomRange.addEventListener('input', () => {
+            const newScale = parseFloat(zoomRange.value);
+            const C = 280, cx = C / 2, cy = C / 2;
+            const sx = (cx - tx) / scale, sy = (cy - ty) / scale;
+            tx = cx - sx * newScale; ty = cy - sy * newScale;
+            scale = newScale; applyTransform();
+        });
+
+        cropCancel.addEventListener('click', () => {
+            cropModal.classList.remove('open');
+            cropModal.setAttribute('aria-hidden', 'true');
+        });
+
+        async function cropToBlobPNG() {
+            const C = 280, D = 512;
+            const sx = (0 - tx) / scale, sy = (0 - ty) / scale;
+            const sw = C / scale, sh = C / scale;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = D; canvas.height = D;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, D, D);
+            ctx.save(); ctx.beginPath(); ctx.arc(D / 2, D / 2, D / 2, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+            await new Promise(res => {
+                const im = new Image();
+                im.onload = () => { ctx.drawImage(im, sx, sy, sw, sh, 0, 0, D, D); ctx.restore(); res(); };
+                im.src = cropImg.src;
+            });
+            return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png'));
+        }
+
+        // === GLOBAL: avatarı yükleyen fonksiyon (artık dış kapsamda!) ===
+        async function uploadAvatarBlob(blob) {
+            const { data: { user }, error: userErr } = await supabase.auth.getUser();
+            if (userErr || !user) { avatarMsg.textContent = 'Giriş yapmanız gerekiyor.'; return; }
+
+            uiBusy(true);
+            const safeName = `avatar_${Date.now()}.png`;
+            const filePath = `${user.id}/${safeName}`;
+
+            // 1) Yükle
+            const { error: upErr } = await supabase.storage.from('avatars').upload(filePath, blob, { contentType: 'image/png', upsert: false });
+            if (upErr) { uiBusy(false); avatarMsg.textContent = 'Yükleme başarısız: ' + upErr.message; return; }
+
+            // 2) Public URL
+            const { data: pub } = supabase.storage.from('avatars').getPublicUrl(filePath);
+            const newUrl = pub?.publicUrl;
+            if (!newUrl) { uiBusy(false); avatarMsg.textContent = 'Public URL oluşturulamadı.'; return; }
+
+            // 3) Eski avatarı sil
+            if (oldAvatarUrl) {
+                const oldPath = storagePathFromPublicUrlAvatars(oldAvatarUrl);
+                if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
+            }
+
+            // 4) Profili güncelle
+            const { error: profErr } = await supabase.from('profiles').update({ avatar_url: newUrl }).eq('id', user.id);
+            uiBusy(false);
+            if (profErr) { avatarMsg.textContent = 'Profil güncellenemedi: ' + profErr.message; return; }
+
+            oldAvatarUrl = newUrl; // global güncelle
+            setAvatarUI(newUrl, getInitialsFromUsername(currentUsername));
+            avatarMsg.textContent = 'Profil fotoğrafı güncellendi.';
+            avatarInput.value = '';
+        }
+
+        // kırp onayı
+        cropConfirm.addEventListener('click', async () => {
+            if (!imgFile) return;
+            const blob = await cropToBlobPNG();
+            if (!blob) { avatarMsg.textContent = 'Kırpma başarısız.'; return; }
+            await uploadAvatarBlob(blob);
+            cropModal.classList.remove('open');
+            cropModal.setAttribute('aria-hidden', 'true');
+        });
+
+        // ===== Profil yükle =====
+        async function loadProfile() {
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            if (userError || !user) {
+                usernameEl.textContent = '-';
+                emailEl.textContent = 'Giriş yapılmamış';
+                idEl.textContent = '-';
+                grid.innerHTML = '<p>Lütfen giriş yapın.</p>';
+                loadingEl.style.display = 'none';
+                editBtn.disabled = true;
+                return;
+            }
+
+            // Sidebar mini profil
+            (async () => {
+                document.getElementById('profileBox').hidden = false;
+                document.getElementById('meName').textContent = user.email?.split('@')[0] || 'Kullanıcı';
+                document.getElementById('meMail').textContent = user.email || '';
+                const meAvatar = document.getElementById('meAvatar'); meAvatar.style.display = 'none';
+            })();
+
+            emailEl.textContent = user.email || '';
+            idEl.textContent = user.id;
+
+            // Profil bilgisi
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('username, last_username_change, avatar_url')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            currentUsername = profile?.username || (user.email?.split('@')[0]) || '-';
+            usernameEl.textContent = currentUsername;
+
+            // Avatar UI
+            oldAvatarUrl = profile?.avatar_url || null;
+            setAvatarUI(oldAvatarUrl, getInitialsFromUsername(currentUsername));
+
+            // 30 gün kuralı
+            const lastChange = profile?.last_username_change ? new Date(profile.last_username_change) : null;
+            const now = new Date();
+            const diffDays = lastChange ? Math.floor((now - lastChange) / (1000 * 60 * 60 * 24)) : 999;
+            const canChange = diffDays >= 30;
+
+            if (canChange) { hintEl.textContent = 'Kullanıcı adını değiştirebilirsin. (Ayda bir kez)'; editBtn.disabled = false; }
+            else { const nextDate = new Date(lastChange.getTime() + 30 * 24 * 60 * 60 * 1000); hintEl.textContent = `Bir sonraki değişiklik tarihi: ${formatDateTR(nextDate)}`; editBtn.disabled = true; }
+
+            // ==== Avatar KIRP & YÜKLE ====
+            avatarInput.addEventListener('change', () => {
+                const f = avatarInput.files?.[0];
+                if (!f) return;
+                if (!f.type.startsWith('image/')) { avatarMsg.textContent = 'Lütfen bir görsel seçin.'; return; }
+                if (f.size > 5 * 1024 * 1024) { avatarMsg.textContent = 'Dosya 5MB üstünde olamaz.'; return; }
+                openCropper(f);
+            });
+            avatarSaveBtn.onclick = () => {
+                const f = avatarInput.files?.[0];
+                if (!f) { avatarMsg.textContent = 'Önce bir görsel seçin.'; return; }
+                openCropper(f);
+            };
+            avatarRemoveBtn.onclick = async () => {
+                avatarMsg.textContent = '';
+                if (!oldAvatarUrl) { avatarMsg.textContent = 'Zaten bir avatar yok.'; return; }
+                if (!confirm('Profil fotoğrafını kaldırmak istiyor musun?')) return;
+                uiBusy(true);
+                const oldPath = storagePathFromPublicUrlAvatars(oldAvatarUrl);
+                if (oldPath) await supabase.storage.from('avatars').remove([oldPath]);
+                const { error: profErr } = await supabase.from('profiles').update({ avatar_url: null }).eq('id', user.id);
+                uiBusy(false);
+                if (profErr) { avatarMsg.textContent = 'Profil güncellenemedi: ' + profErr.message; return; }
+                oldAvatarUrl = null;
+                setAvatarUI(null, getInitialsFromUsername(currentUsername));
+                avatarMsg.textContent = 'Profil fotoğrafı kaldırıldı.';
+            };
+
+            // ==== Fotoğraflar + sayaçlar ====
+            const { data, error } = await supabase
+                .from('photo_metadata')
+                .select('id, title, image_url')
+                .eq('user_id', user.id)
+                .order('id', { ascending: false });
+
+            loadingEl.style.display = 'none';
+            if (error) { grid.innerHTML = '<p>Fotoğraflar yüklenirken hata oluştu.</p>'; return; }
+            if (!data || data.length === 0) { grid.innerHTML = '<p>Henüz fotoğraf yüklemediniz.</p>'; return; }
+
+            grid.innerHTML = '';
+            for (const photo of data) {
+                const [{ count: likeCount }, { count: commentCount }] = await Promise.all([
+                    supabase.from('likes').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
+                    supabase.from('comments').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
+                ]);
+
+                const card = document.createElement('div');
+                card.className = 'album-card';
+                card.id = `photo-${photo.id}`;
+                card.innerHTML = `
+          <img src="${photo.image_url}" alt="${photo.title || 'Başlıksız'}">
+          <div class="caption">${photo.title || 'Başlıksız'}</div>
+          <div class="badges">
+            <span class="badge">❤️ <span>${likeCount || 0}</span></span>
+            <span class="badge">💬 <span>${commentCount || 0}</span></span>
+          </div>
+          <div class="actions">
+            <button class="del-btn" data-id="${photo.id}">Sil</button>
+          </div>
+        `;
+                card.querySelector('.del-btn').addEventListener('click', async () => { await deletePhoto(photo); });
+                grid.appendChild(card);
+            }
+
+            // ==== Kullanıcı adı düzenleme UI ====
+            editBtn.onclick = () => {
+                if (editBtn.disabled) return;
+                clearErr();
+                input.value = usernameEl.textContent;
+                usernameEl.parentElement.style.display = 'none';
+                show(input); show(saveBtn); show(cancelBtn);
+                editBtn.disabled = true;
+                input.focus();
+            };
+            cancelBtn.onclick = () => {
+                clearErr();
+                input.value = '';
+                usernameEl.parentElement.style.display = '';
+                hide(input); hide(saveBtn); hide(cancelBtn);
+                editBtn.disabled = !canChange;
+            };
+            saveBtn.onclick = async () => {
+                clearErr();
+                const newU = input.value.trim();
+                if (!validateUsername(newU)) { showErr('Kullanıcı adı 3-30 karakter olmalı; sadece harf, rakam, altçizgi ve harfle başlamalı.'); return; }
+                if (!canChange) { showErr('Ayda bir kez değiştirebilirsiniz. Lütfen belirtilen tarihten sonra deneyin.'); return; }
+                const { count: existsCount, error: checkErr } = await supabase
+                    .from('profiles').select('*', { count: 'exact', head: true })
+                    .neq('id', user.id).ilike('username', newU);
+                if (checkErr) { showErr('Kontrol sırasında hata: ' + checkErr.message); return; }
+                if ((existsCount ?? 0) > 0) { showErr('Bu kullanıcı adı zaten alınmış.'); return; }
+                const { error: upErr } = await supabase
+                    .from('profiles').update({ username: newU, last_username_change: new Date().toISOString() }).eq('id', user.id);
+                if (upErr) { showErr('Güncellenemedi: ' + upErr.message); return; }
+                currentUsername = newU;
+                usernameEl.textContent = newU;
+                cancelBtn.onclick();
+                location.reload();
+            };
+        }
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

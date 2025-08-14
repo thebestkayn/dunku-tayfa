@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Ana Sayfa — Dünkü Tayfa Vadisi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <style>
+        :root {
+            --bg: #0f3236;
+            --card: #ffffff;
+            --text: #1f2a33;
+            --muted: #475569;
+            /* yorum meta için biraz daha koyu */
+            --border: #e2e8f0;
+            --accent: #0ea5e9;
+            --accent-pressed: #0b8ac4;
+            --ok: #16a34a;
+            --err: #dc2626;
+            --radius: 14px;
+            --shadow: 0 8px 30px rgba(2, 6, 23, 0.15);
+            --focus: 0 0 0 3px rgba(14, 165, 233, .35);
+            --sidebar-w: 260px;
+
+            /* yorumlar için özel zemin */
+            --comment-bg: #f8fafc;
+            --comment-muted: #475569;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card: #0b1b1e;
+                --text: #e6edf3;
+                --muted: #a3b3c3;
+                --border: #18343a;
+                --shadow: 0 8px 30px rgba(0, 0, 0, .45);
+
+                /* koyu temada yorum balonları */
+                --comment-bg: #0f1d20;
+                --comment-muted: #96a3b1;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100dvh;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+            color: var(--text);
+            background:
+                radial-gradient(1200px 800px at 10% -20%, #195159 0%, transparent 60%),
+                radial-gradient(1000px 600px at 120% 120%, #0b3a40 0%, transparent 60%),
+                var(--bg);
+        }
+
+        /* ==== Sidebar ==== */
+        .sidebar {
+            position: fixed;
+            inset: auto auto 0 0;
+            top: 0;
+            width: var(--sidebar-w);
+            height: 100dvh;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .04)), rgba(255, 255, 255, .04);
+            border-right: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            transform: translateX(0);
+            transition: transform .25s ease;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .12);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .brand .title {
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .brand .subtitle {
+            margin: 2px 0 0;
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 8px;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            flex: 0 0 36px;
+        }
+
+        .me {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .me .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .me .mail {
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .nav {
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid transparent;
+            transition: background .15s ease, transform .06s ease;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, .08);
+            transform: translateY(1px);
+        }
+
+        .nav a.active {
+            background: rgba(255, 255, 255, .14);
+            border-color: rgba(255, 255, 255, .22);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .signout-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .signout-btn:hover {
+            background: rgba(255, 255, 255, .14);
+        }
+
+        /* Mobile: off-canvas sidebar */
+        .menu-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 60;
+            border: 1px solid rgba(255, 255, 255, .3);
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+            backdrop-filter: blur(6px);
+        }
+
+        @media (max-width: 960px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* ==== Content ==== */
+        .content {
+            margin-left: var(--sidebar-w);
+            padding: 24px;
+            min-height: 100dvh;
+        }
+
+        @media (max-width: 960px) {
+            .content {
+                margin-left: 0;
+                padding-top: 64px;
+            }
+        }
+
+        h1.page-title {
+            margin: 0 0 16px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+            font-size: clamp(22px, 4vw, 32px);
+        }
+
+        /* ==== Gallery Grid ==== */
+        #gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        .photo-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+            width: 100%;
+        }
+
+        .photo-card h3 {
+            margin: 0 0 10px;
+        }
+
+        .photo-card img {
+            width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .like-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .like-btn.liked {
+            background-color: #dc3545;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Uploader row / avatars */
+        .uploader-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: .25rem 0 .75rem;
+        }
+
+        .avatar-sm {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            flex: 0 0 28px;
+        }
+
+        .avatar-xs {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            flex: 0 0 22px;
+        }
+
+        .uploader-name {
+            font-size: .95em;
+            color: var(--muted);
+        }
+
+        /* ===== Comments - READABILITY UPGRADE ===== */
+        .comments {
+            margin-top: 16px;
+            width: 100%;
+        }
+
+        .comment-list {
+            background: var(--comment-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .comment-item {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .comment-content {
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .comment-meta {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--comment-muted);
+            opacity: 1;
+            /* düşük opaklık kaldırıldı */
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .comment-meta .author {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .comment-meta time {
+            font-variant-numeric: tabular-nums;
+            opacity: .95;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .inline-reply-form {
+            margin-top: 8px;
+            display: none;
+            gap: 8px;
+        }
+
+        .inline-reply-form input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .comment-submit {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .children {
+            margin-left: 14px;
+            border-left: 2px solid var(--border);
+            padding-left: 12px;
+            margin-top: 8px;
+        }
+
+        /* Lightbox */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 85vh;
+        }
+
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .4);
+        }
+
+        .lightbox-title {
+            color: #fff;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            opacity: .9;
+        }
+
+        .lightbox-close,
+        .lightbox-prev,
+        .lightbox-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, .18);
+            color: #fff;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .lightbox-close {
+            top: 18px;
+            right: 18px;
+            transform: none;
+            width: 38px;
+            height: 38px;
+            font-size: 20px;
+        }
+
+        .lightbox-prev {
+            left: -60px;
+        }
+
+        .lightbox-next {
+            right: -60px;
+        }
+
+        @media (max-width:640px) {
+            .lightbox-prev {
+                left: 8px;
+            }
+
+            .lightbox-next {
+                right: 8px;
+            }
+        }
+
+        .reply-btn {
+            background: #ffc107;
+            color: #222;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile hamburger -->
+    <button class="menu-toggle" id="menuToggle" aria-controls="sidebar" aria-expanded="false">☰ Menü</button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar" aria-label="Yan menü">
+        <div class="brand">
+            <div class="logo">DT</div>
+            <div>
+                <h2 class="title">Dünkü Tayfa</h2>
+                <div class="subtitle">Vadisi</div>
+            </div>
+        </div>
+
+        <div class="profile" id="profileBox" hidden>
+            <img id="meAvatar" class="avatar" alt="" />
+            <div class="me">
+                <span id="meName" class="name">Kullanıcı</span>
+                <span id="meMail" class="mail"></span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <a href="AnaSayfa.html">🏠 Ana Sayfa</a>
+            <a href="upload.html">📤 Fotoğraf Yükle</a>
+            <a href="profile.html">👤 Profilim</a>
+        </nav>
+
+        <div class="spacer"></div>
+        <button id="signOut" class="signout-btn">Çıkış Yap</button>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+        <h1 class="page-title">Dünkü Tayfa Fotoğraf Galerisi</h1>
+        <div id="gallery"></div>
+    </main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
+        <div class="lightbox-content">
+            <button id="lb-close" class="lightbox-close" aria-label="Kapat">✕</button>
+            <button id="lb-prev" class="lightbox-prev" aria-label="Önceki">‹</button>
+            <img id="lb-img" class="lightbox-img" alt="Fotoğraf" />
+            <button id="lb-next" class="lightbox-next" aria-label="Sonraki">›</button>
+            <div id="lb-title" class="lightbox-title"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const supabaseUrl = 'https://dsrmfijgzzktlvjlkytc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzcm1maWpnenprdGx2amxreXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MDE3NjAsImV4cCI6MjA2OTQ3Nzc2MH0.PRj-jRw3bZls-IbokmJtQYpAXXam_Ygtk7n4q8tmqwc';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const gallery = document.getElementById('gallery');
+
+        // === Session & profile ===
+        async function getSessionUser() {
+            const { data: { session } } = await supabase.auth.getSession();
+            return session?.user || null;
+        }
+
+        const profileCache = new Map();
+        const avatarCache = new Map();
+
+        async function getDisplayName(uid) {
+            if (profileCache.has(uid)) return profileCache.get(uid);
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('username, email')
+                .eq('id', uid)
+                .maybeSingle();
+            let name = 'Anonim';
+            if (!error && data) { name = data.username || data.email || `kullanici_${uid.slice(0, 8)}`; }
+            else { name = `kullanici_${uid.slice(0, 8)}`; }
+            profileCache.set(uid, name);
+            return name;
+        }
+
+        async function getAvatarUrl(uid) {
+            if (avatarCache.has(uid)) return avatarCache.get(uid);
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('avatar_url, email')
+                .eq('id', uid)
+                .maybeSingle();
+            const url = (!error && data?.avatar_url) ? data.avatar_url : null;
+            avatarCache.set(uid, url);
+            return url;
+        }
+
+        function escapeText(str) { return (str ?? '').toString(); }
+
+        // === Sidebar: active link + mobile toggle + sign out ===
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('menuToggle');
+        toggleBtn?.addEventListener('click', () => {
+            const open = sidebar.classList.toggle('open');
+            toggleBtn.setAttribute('aria-expanded', String(open));
+        });
+
+        const here = location.pathname.split('/').pop() || 'AnaSayfa.html';
+        document.querySelectorAll('.nav a').forEach(a => {
+            if (a.getAttribute('href') === here) a.classList.add('active');
+            a.addEventListener('click', () => sidebar.classList.remove('open')); // mobile close on navigate
+        });
+
+        document.getElementById('signOut')?.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            location.href = 'DunkuTayfa.html';
+        });
+
+        // Fill profile box
+        (async () => {
+            const me = await getSessionUser();
+            if (!me) return;
+            const box = document.getElementById('profileBox');
+            const nameEl = document.getElementById('meName');
+            const mailEl = document.getElementById('meMail');
+            const avEl = document.getElementById('meAvatar');
+            nameEl.textContent = await getDisplayName(me.id);
+            mailEl.textContent = me.email || '';
+            const url = await getAvatarUrl(me.id);
+            if (url) avEl.src = url; else avEl.style.display = 'none';
+            box.hidden = false;
+        })();
+
+        // === Lightbox state ===
+        const lightbox = { photos: [], index: 0 };
+        const lbEl = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lb-img');
+        const lbTitle = document.getElementById('lb-title');
+        const lbPrev = document.getElementById('lb-prev');
+        const lbNext = document.getElementById('lb-next');
+        const lbClose = document.getElementById('lb-close');
+
+        function showPhoto(i) {
+            if (!lightbox.photos.length) return;
+            lightbox.index = (i + lightbox.photos.length) % lightbox.photos.length;
+            const p = lightbox.photos[lightbox.index];
+            lbImg.src = p.url; lbTitle.textContent = p.title || '';
+        }
+        function openLightbox(i) { lbEl.style.display = 'flex'; lbEl.setAttribute('aria-hidden', 'false'); showPhoto(i); }
+        function closeLightbox() { lbEl.style.display = 'none'; lbEl.setAttribute('aria-hidden', 'true'); }
+        lbPrev.addEventListener('click', () => showPhoto(lightbox.index - 1));
+        lbNext.addEventListener('click', () => showPhoto(lightbox.index + 1));
+        lbClose.addEventListener('click', closeLightbox);
+        lbEl.addEventListener('click', (e) => { if (e.target === lbEl) closeLightbox(); });
+        window.addEventListener('keydown', (e) => {
+            if (lbEl.getAttribute('aria-hidden') === 'true') return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') showPhoto(lightbox.index - 1);
+            if (e.key === 'ArrowRight') showPhoto(lightbox.index + 1);
+        });
+
+        // === Comments (threaded) ===
+        async function fetchComments(photoId) {
+            const { data, error } = await supabase
+                .from('comments')
+                .select('id, content, created_at, user_id, parent_id, photo_id')
+                .eq('photo_id', photoId)
+                .order('created_at', { ascending: true });
+            if (error) { console.error('Yorumlar alınamadı:', error); return []; }
+            return data || [];
+        }
+
+        async function addComment(photoId, userId, content, parentId = null) {
+            const trimmed = (content || '').trim();
+            if (!trimmed) throw new Error('Boş yorum gönderilemez');
+            if (trimmed.length > 1000) throw new Error('Yorum 1000 karakteri aşamaz');
+            const { error } = await supabase
+                .from('comments')
+                .insert([{ photo_id: photoId, user_id: userId, content: trimmed, parent_id: parentId }]);
+            if (error) throw error;
+        }
+
+        function buildTree(flat) {
+            const byId = new Map();
+            flat.forEach(c => byId.set(c.id, { ...c, children: [] }));
+            const roots = [];
+            byId.forEach(node => {
+                if (node.parent_id && byId.has(node.parent_id)) byId.get(node.parent_id).children.push(node);
+                else roots.push(node);
+            });
+            return roots;
+        }
+
+        function renderTree(container, nodes, currentUserId, refreshFn) {
+            nodes.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+
+                const content = document.createElement('div');
+                content.className = 'comment-content';
+                content.textContent = escapeText(c.content);
+
+                const meta = document.createElement('div');
+                meta.className = 'comment-meta';
+
+                if (c.avatarUrl) {
+                    const av = document.createElement('img');
+                    av.className = 'avatar-xs';
+                    av.src = c.avatarUrl;
+                    av.alt = '';
+                    av.onerror = () => av.style.display = 'none';
+                    meta.appendChild(av);
+                }
+
+                const whenIso = new Date(c.created_at).toISOString();
+                const whenTxt = new Date(c.created_at).toLocaleString('tr-TR');
+
+                // İSİM ve TARİH ayrı stillenir
+                const author = document.createElement('span');
+                author.className = 'author';
+                author.textContent = c.displayName;
+
+                const sep = document.createElement('span');
+                sep.textContent = '•';
+
+                const when = document.createElement('time');
+                when.setAttribute('datetime', whenIso);
+                when.textContent = whenTxt;
+
+                meta.appendChild(author);
+                meta.appendChild(sep);
+                meta.appendChild(when);
+
+                const actions = document.createElement('div');
+                actions.className = 'comment-actions';
+
+                const replyBtn = document.createElement('button');
+                replyBtn.className = 'reply-btn';
+                replyBtn.textContent = 'Yanıtla';
+
+                const replyForm = document.createElement('form');
+                replyForm.className = 'inline-reply-form';
+                replyForm.style.display = 'none';
+                replyForm.innerHTML = `
+          <input type="text" placeholder="Yanıt yaz..." required />
+          <button type="submit" class="comment-submit">Gönder</button>
+        `;
+
+                replyBtn.addEventListener('click', () => {
+                    replyForm.style.display = (replyForm.style.display === 'none') ? 'flex' : 'none';
+                    if (replyForm.style.display !== 'none') replyForm.querySelector('input')?.focus();
+                });
+
+                replyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const input = replyForm.querySelector('input');
+                    try {
+                        await addComment(c.photo_id, currentUserId, input.value, c.id);
+                        input.value = '';
+                        replyForm.style.display = 'none';
+                        await refreshFn();
+                    } catch (err) {
+                        alert('Yanıt eklenemedi: ' + (err?.message || err));
+                    }
+                });
+
+                actions.appendChild(replyBtn);
+
+                if (c.user_id === currentUserId) {
+                    const delBtn = document.createElement('button');
+                    delBtn.textContent = 'Sil';
+                    delBtn.className = 'delete-btn';
+                    delBtn.addEventListener('click', async () => {
+                        if (confirm('Yorumu silmek istediğinize emin misiniz?')) {
+                            const { error } = await supabase.from('comments').delete().eq('id', c.id);
+                            if (error) alert('Yorum silinemedi: ' + error.message);
+                            else await refreshFn();
+                        }
+                    });
+                    actions.appendChild(delBtn);
+                }
+
+                item.appendChild(content);
+                item.appendChild(meta);
+                item.appendChild(actions);
+                item.appendChild(replyForm);
+                container.appendChild(item);
+
+                if (c.children?.length) {
+                    const childBox = document.createElement('div');
+                    childBox.className = 'children';
+                    renderTree(childBox, c.children, currentUserId, refreshFn);
+                    container.appendChild(childBox);
+                }
+            });
+        }
+
+        // === Likes helper ===
+        async function getLikeCount(photoId) {
+            const { count } = await supabase
+                .from('likes')
+                .select('*', { count: 'exact', head: true })
+                .eq('photo_id', photoId);
+            return count || 0;
+        }
+
+        // === Load photos ===
+        async function loadPhotos() {
+            const user = await getSessionUser();
+            if (!user) return alert('Giriş yapmanız gerekiyor.');
+
+            const { data: photos, error } = await supabase
+                .from('photo_metadata')
+                .select('id, title, image_url, created_at, user_id')
+                .order('created_at', { ascending: false });
+
+            if (error) { console.error('Fotoğraflar alınamadı:', error); return; }
+
+            for (const photo of photos) {
+                const { data: like } = await supabase
+                    .from('likes').select('id')
+                    .eq('photo_id', photo.id).eq('user_id', user.id)
+                    .maybeSingle();
+                const isLiked = !!like;
+                const likeCount = await getLikeCount(photo.id);
+
+                const uploaderName = await getDisplayName(photo.user_id);
+                const uploaderAvatar = await getAvatarUrl(photo.user_id);
+
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+          <h3>${photo.title}</h3>
+
+          <div class="uploader-row">
+            ${uploaderAvatar ? `<img class="avatar-sm" src="${uploaderAvatar}" alt="" onerror="this.style.display='none'">` : ``}
+            <span class="uploader-name">Yükleyen: ${uploaderName}</span>
+          </div>
+
+          <img src="${photo.image_url}" alt="${photo.title}">
+          <p>Beğeni: <span id="like-count-${photo.id}">${likeCount}</span></p>
+          <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${photo.id}">
+            ${isLiked ? 'Beğeniyi Geri Al' : 'Beğen'}
+          </button>
+
+          <div class="comments">
+            <h4>Yorumlar</h4>
+            <div id="comment-list-${photo.id}" class="comment-list" data-photo-id="${photo.id}"></div>
+            <form id="comment-form-${photo.id}" class="comment-form">
+              <input type="text" id="comment-input-${photo.id}" class="comment-input" placeholder="Yorum yaz..." required />
+              <button type="submit" class="comment-submit">Gönder</button>
+            </form>
+          </div>
+        `;
+                gallery.appendChild(card);
+
+                // Lightbox sequence
+                const imgEl = card.querySelector('img');
+                const idx = lightbox.photos.length;
+                lightbox.photos.push({ url: photo.image_url, title: `${photo.title || ''}${uploaderName ? ' — ' + uploaderName : ''}` });
+                imgEl.style.cursor = 'zoom-in';
+                imgEl.addEventListener('click', () => openLightbox(idx));
+
+                // Like toggle
+                card.querySelector('.like-btn').addEventListener('click', async function () {
+                    const likeBtn = this;
+                    const liked = likeBtn.classList.contains('liked');
+                    const photoId = likeBtn.getAttribute('data-id');
+
+                    if (liked) {
+                        await supabase.from('likes').delete().eq('photo_id', photoId).eq('user_id', user.id);
+                        likeBtn.classList.remove('liked');
+                        likeBtn.textContent = 'Beğen';
+                    } else {
+                        await supabase.from('likes').insert({ photo_id: photoId, user_id: user.id });
+                        likeBtn.classList.add('liked');
+                        likeBtn.textContent = 'Beğeniyi Geri Al';
+                    }
+
+                    const updatedLikeCount = await getLikeCount(photoId);
+                    document.getElementById(`like-count-${photoId}`).textContent = updatedLikeCount;
+                });
+
+                // Comments
+                const listEl = card.querySelector(`#comment-list-${photo.id}`);
+                const formEl = card.querySelector(`#comment-form-${photo.id}`);
+                const inputEl = card.querySelector(`#comment-input-${photo.id}`);
+
+                async function refreshComments() {
+                    const raw = await fetchComments(photo.id);
+                    const withNames = await Promise.all(raw.map(async (c) => ({
+                        ...c,
+                        displayName: await getDisplayName(c.user_id),
+                        avatarUrl: await getAvatarUrl(c.user_id),
+                    })));
+                    const tree = buildTree(withNames);
+                    listEl.innerHTML = '';
+                    renderTree(listEl, tree, user.id, refreshComments);
+                }
+                await refreshComments();
+
+                formEl.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await addComment(photo.id, user.id, inputEl.value, null);
+                        inputEl.value = '';
+                        await refreshComments();
+                    } catch (err) {
+                        console.error(err);
+                        alert('Yorum eklenemedi: ' + (err?.message || err));
+                    }
+                });
+
+                // Realtime comments
+                supabase
+                    .channel(`comments-${photo.id}`)
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments', filter: `photo_id=eq.${photo.id}` }, async () => { await refreshComments(); })
+                    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'comments', filter: `photo_id=eq.${photo.id}` }, async () => { await refreshComments(); })
+                    .subscribe();
+            }
+        }
+
+        loadPhotos();
+    </script>
+</body>
+
+</html>

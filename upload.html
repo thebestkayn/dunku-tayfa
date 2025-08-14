@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Fotoğraf Yükle — Dünkü Tayfa Vadisi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <style>
+        :root {
+            --bg: #0f3236;
+            --card: #ffffff;
+            --text: #1f2a33;
+            --muted: #475569;
+            --border: #e2e8f0;
+            --accent: #0ea5e9;
+            --accent-pressed: #0b8ac4;
+            --ok: #16a34a;
+            --err: #dc2626;
+            --radius: 14px;
+            --shadow: 0 8px 30px rgba(2, 6, 23, 0.15);
+            --focus: 0 0 0 3px rgba(14, 165, 233, .35);
+            --sidebar-w: 260px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card: #0b1b1e;
+                --text: #e6edf3;
+                --muted: #a3b3c3;
+                --border: #18343a;
+                --shadow: 0 8px 30px rgba(0, 0, 0, .45);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100dvh;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+            color: var(--text);
+            background:
+                radial-gradient(1200px 800px at 10% -20%, #195159 0%, transparent 60%),
+                radial-gradient(1000px 600px at 120% 120%, #0b3a40 0%, transparent 60%),
+                var(--bg);
+        }
+
+        /* ==== Sidebar (AnaSayfa ile aynı) ==== */
+        .sidebar {
+            position: fixed;
+            inset: auto auto 0 0;
+            top: 0;
+            width: var(--sidebar-w);
+            height: 100dvh;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .04)), rgba(255, 255, 255, .04);
+            border-right: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            transform: translateX(0);
+            transition: transform .25s ease;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .12);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .brand .title {
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .brand .subtitle {
+            margin: 2px 0 0;
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 8px;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            flex: 0 0 36px;
+        }
+
+        .me {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .me .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .me .mail {
+            font-size: 12px;
+            opacity: .85;
+        }
+
+        .nav {
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid transparent;
+            transition: background .15s ease, transform .06s ease;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, .08);
+            transform: translateY(1px);
+        }
+
+        .nav a.active {
+            background: rgba(255, 255, 255, .14);
+            border-color: rgba(255, 255, 255, .22);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .signout-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .signout-btn:hover {
+            background: rgba(255, 255, 255, .14);
+        }
+
+        /* Mobile: off-canvas */
+        .menu-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 60;
+            border: 1px solid rgba(255, 255, 255, .3);
+            background: rgba(255, 255, 255, .15);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+            backdrop-filter: blur(6px);
+        }
+
+        @media (max-width: 960px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* ==== Content ==== */
+        .content {
+            margin-left: var(--sidebar-w);
+            padding: 24px;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width:960px) {
+            .content {
+                margin-left: 0;
+                padding-top: 64px;
+                align-items: flex-start;
+            }
+        }
+
+        .upload-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 720px;
+            padding: 20px;
+        }
+
+        .upload-card header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .upload-card h2 {
+            margin: 0 0 6px;
+            font-size: 22px;
+        }
+
+        .upload-card p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        label {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: inherit;
+            transition: box-shadow .15s ease, border-color .15s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: var(--focus);
+        }
+
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .dropzone {
+                background: #0f1d20;
+                color: #e6edf3;
+            }
+        }
+
+        .dropzone.drag {
+            border-color: var(--accent);
+            background: rgba(14, 165, 233, .08);
+        }
+
+        .dropzone input {
+            display: none;
+        }
+
+        .dropzone .hint {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .preview {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            background: rgba(2, 6, 23, .02);
+        }
+
+        .preview img {
+            max-width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .file-info {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .06s ease, background .15s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent-pressed);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn[disabled] {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+        .ghost {
+            background: #6c757d;
+        }
+
+        .ghost:hover {
+            filter: brightness(1.05);
+        }
+
+        .status {
+            min-height: 22px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .status.error {
+            color: var(--err);
+        }
+
+        .status.ok {
+            color: var(--ok);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile hamburger -->
+    <button class="menu-toggle" id="menuToggle" aria-controls="sidebar" aria-expanded="false">☰ Menü</button>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar" aria-label="Yan menü">
+        <div class="brand">
+            <div class="logo">DT</div>
+            <div>
+                <h2 class="title">Dünki Tayfa</h2>
+                <div class="subtitle">Vadisi</div>
+            </div>
+        </div>
+
+        <div class="profile" id="profileBox" hidden>
+            <img id="meAvatar" class="avatar" alt="" />
+            <div class="me">
+                <span id="meName" class="name">Kullanıcı</span>
+                <span id="meMail" class="mail"></span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <a href="AnaSayfa.html">🏠 Ana Sayfa</a>
+            <a href="upload.html">📤 Fotoğraf Yükle</a>
+            <a href="profile.html">👤 Profilim</a>
+        </nav>
+
+        <div class="spacer"></div>
+        <button id="signOut" class="signout-btn">Çıkış Yap</button>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+        <section class="upload-card">
+            <header>
+                <h2>Fotoğraf Yükle</h2>
+                <p>Güzel bir başlık ekle, görselini seç ve paylaş.</p>
+            </header>
+
+            <form id="uploadForm" class="form" novalidate>
+                <div>
+                    <label for="title">Başlık</label>
+                    <input type="text" id="title" placeholder="ör. Yaz Kampı 2025 — 1. Gün" required />
+                </div>
+
+                <div class="dropzone" id="dropzone">
+                    <strong>Görseli sürükleyip bırak</strong> veya
+                    <label for="image" style="color:var(--accent); cursor:pointer; text-decoration: underline;">dosya
+                        seç</label>
+                    <input type="file" id="image" accept="image/*" />
+                    <div class="hint">Sadece görseller. En fazla 10 MB.</div>
+                </div>
+
+                <div id="preview" class="preview" hidden>
+                    <div class="file-info" id="fileInfo"></div>
+                    <img id="previewImg" alt="Önizleme" />
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn" id="uploadBtn">Yükle</button>
+                    <div class="status" id="status" aria-live="polite"></div>
+                    <button type="button" class="btn ghost" id="goHome">Ana Sayfa'ya Dön</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const supabaseUrl = 'https://dsrmfijgzzktlvjlkytc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzcm1maWpnenprdGx2amxreXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MDE3NjAsImV4cCI6MjA2OTQ3Nzc2MH0.PRj-jRw3bZls-IbokmJtQYpAXXam_Ygtk7n4q8tmqwc';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Sidebar state
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('menuToggle');
+        toggleBtn?.addEventListener('click', () => {
+            const open = sidebar.classList.toggle('open');
+            toggleBtn.setAttribute('aria-expanded', String(open));
+        });
+        const here = location.pathname.split('/').pop() || 'upload.html';
+        document.querySelectorAll('.nav a').forEach(a => {
+            if (a.getAttribute('href') === here) a.classList.add('active');
+            a.addEventListener('click', () => sidebar.classList.remove('open'));
+        });
+
+        document.getElementById('signOut')?.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            location.href = 'DunkuTayfa.html';
+        });
+
+        // Fill profile box
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            const me = session?.user;
+            if (!me) return;
+            const box = document.getElementById('profileBox');
+            document.getElementById('meName').textContent = me.email?.split('@')[0] || 'Kullanıcı';
+            document.getElementById('meMail').textContent = me.email || '';
+            const avEl = document.getElementById('meAvatar');
+            avEl.style.display = 'none'; // avatar kullanmıyorsak gizle
+            box.hidden = false;
+        })();
+
+        // === Upload logic ===
+        const form = document.getElementById('uploadForm');
+        const titleInput = document.getElementById('title');
+        const fileInput = document.getElementById('image');
+        const dropzone = document.getElementById('dropzone');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const statusEl = document.getElementById('status');
+        const previewBox = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const fileInfo = document.getElementById('fileInfo');
+        const goHome = document.getElementById('goHome');
+        goHome.addEventListener('click', () => location.href = 'AnaSayfa.html');
+
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+        function sanitizeName(name) {
+            return name
+                .normalize('NFD')
+                .replace(/[\\u0300-\\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9._-]/g, '_');
+        }
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                previewImg.src = reader.result;
+                previewBox.hidden = false;
+            };
+            reader.readAsDataURL(file);
+            fileInfo.textContent = `${file.name} - ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            if (!titleInput.value.trim()) {
+                const base = file.name.replace(/\\.[^.]+$/, '');
+                titleInput.value = base;
+            }
+        }
+
+        function handleFiles(files) {
+            const file = files?.[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                statusEl.textContent = 'Yalnızca görsel dosyaları desteklenir.';
+                statusEl.className = 'status error';
+                return;
+            }
+            if (file.size > MAX_SIZE) {
+                statusEl.textContent = 'Dosya 10 MB sınırını aşıyor.';
+                statusEl.className = 'status error';
+                return;
+            }
+            statusEl.textContent = '';
+            statusEl.className = 'status';
+            fileInput.files = files; // form submit için ata
+            showPreview(file);
+        }
+
+        // Drag&drop
+        ;['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, e => {
+            e.preventDefault(); e.stopPropagation(); dropzone.classList.add('drag');
+        }));
+        ;['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, e => {
+            e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('drag');
+        }));
+        dropzone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+        fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            statusEl.textContent = '';
+            statusEl.className = 'status';
+
+            const file = fileInput.files?.[0];
+            const title = titleInput.value.trim();
+            if (!file) { statusEl.textContent = 'Lütfen bir görsel seçin.'; statusEl.className = 'status error'; return; }
+            if (!title) { statusEl.textContent = 'Lütfen bir başlık yazın.'; statusEl.className = 'status error'; return; }
+
+            // Kullanıcı
+            const { data: { user }, error: userErr } = await supabase.auth.getUser();
+            if (userErr || !user) { statusEl.textContent = 'Giriş yapmanız gerekiyor.'; statusEl.className = 'status error'; return; }
+
+            // Dosya adı + yol
+            const safe = sanitizeName(file.name);
+            const path = `${user.id}/${Date.now()}_${safe}`;
+
+            try {
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = 'Yükleniyor…';
+
+                // Storage'a yükle
+                const { error: upErr } = await supabase.storage.from('uploads').upload(path, file);
+                if (upErr) { throw upErr; }
+
+                // Public URL
+                const { data: pub } = supabase.storage.from('uploads').getPublicUrl(path);
+                const publicUrl = pub.publicUrl;
+
+                // Metadata
+                const { error: insErr } = await supabase
+                    .from('photo_metadata')
+                    .insert([{ title, image_url: publicUrl, user_id: user.id, likes: 0 }]);
+
+                if (insErr) { throw insErr; }
+
+                statusEl.textContent = 'Yükleme başarılı! Ana sayfaya yönlendiriliyorsunuz…';
+                statusEl.className = 'status ok';
+                setTimeout(() => location.href = 'AnaSayfa.html', 900);
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'Yükleme sırasında bir hata oluştu: ' + (err?.message || err);
+                statusEl.className = 'status error';
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Yükle';
+            }
+        });
+    </script>
+</body>
+
+</html>
