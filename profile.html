@@ -875,13 +875,8 @@
         async function loadProfile() {
             const { data: { user }, error: userError } = await supabase.auth.getUser();
             if (userError || !user) {
-                usernameEl.textContent = '-';
-                emailEl.textContent = 'Giriş yapılmamış';
-                idEl.textContent = '-';
-                grid.innerHTML = '<p>Lütfen giriş yapın.</p>';
-                loadingEl.style.display = 'none';
-                editBtn.disabled = true;
-                return;
+                window.location.href = 'DunkuTayfa.html';
+                throw new Error('No session');
             }
 
             // Sidebar mini profil
@@ -894,6 +889,16 @@
 
             emailEl.textContent = user.email || '';
             idEl.textContent = user.id;
+
+            // (yedek) profiles satırını garantiye al
+            await supabase
+                .from('profiles')
+                .upsert({
+                    id: user.id,
+                    email: user.email || null,
+                    username: (user.email?.split('@')[0]) || null
+                }, { onConflict: 'id' });
+
 
             // Profil bilgisi
             const { data: profile } = await supabase
@@ -978,6 +983,7 @@
             <button class="del-btn" data-id="${photo.id}">Sil</button>
           </div>
         `;
+                (card.querySelector('.caption') || {}).textContent = (photo.title ?? 'Başlıksız');
                 card.querySelector('.del-btn').addEventListener('click', async () => { await deletePhoto(photo); });
                 grid.appendChild(card);
             }

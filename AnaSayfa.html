@@ -874,6 +874,8 @@
             </form>
           </div>
         `;
+                // XSS guard for title
+                (card.querySelector('h3') || {}).textContent = (photo.title ?? 'Başlıksız');
                 gallery.appendChild(card);
 
                 // Lightbox sequence

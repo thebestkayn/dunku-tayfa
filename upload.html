@@ -395,6 +395,22 @@
         .status.ok {
             color: var(--ok);
         }
+
+        /* "Yükle" butonunu belirginleştir */
+        #uploadBtn {
+            background: #22c55e;
+            /* yeşil */
+            border-color: transparent;
+            box-shadow: 0 6px 18px rgba(34, 197, 94, .35);
+        }
+
+        #uploadBtn:hover {
+            background: #16a34a;
+        }
+
+        #uploadBtn:active {
+            transform: translateY(1px);
+        }
     </style>
 </head>
 
@@ -407,7 +423,7 @@
         <div class="brand">
             <div class="logo">DT</div>
             <div>
-                <h2 class="title">Dünki Tayfa</h2>
+                <h2 class="title">Dünkü Tayfa</h2>
                 <div class="subtitle">Vadisi</div>
             </div>
         </div>
@@ -424,6 +440,7 @@
             <a href="AnaSayfa.html">🏠 Ana Sayfa</a>
             <a href="upload.html">📤 Fotoğraf Yükle</a>
             <a href="profile.html">👤 Profilim</a>
+            <a href="prita.html">🔄 Prita</a>
         </nav>
 
         <div class="spacer"></div>
@@ -495,7 +512,7 @@
         (async () => {
             const { data: { session } } = await supabase.auth.getSession();
             const me = session?.user;
-            if (!me) return;
+            if (!me) { location.href = 'DunkuTayfa.html'; throw new Error('No session'); }
             const box = document.getElementById('profileBox');
             document.getElementById('meName').textContent = me.email?.split('@')[0] || 'Kullanıcı';
             document.getElementById('meMail').textContent = me.email || '';
@@ -522,7 +539,7 @@
         function sanitizeName(name) {
             return name
                 .normalize('NFD')
-                .replace(/[\\u0300-\\u036f]/g, '')
+                .replace(/[̀-ͯ]/g, '')
                 .replace(/[^a-zA-Z0-9._-]/g, '_');
         }
 

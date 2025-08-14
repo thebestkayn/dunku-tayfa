@@ -442,6 +442,14 @@
                 statusEl.className = 'status error';
                 return;
             }
+            const usernameRe = /^[a-zA-ZçÇğĞıİöÖşŞüÜ][a-zA-Z0-9_çÇğĞıİöÖşŞüÜ]{2,29}$/;
+
+            if (!usernameRe.test(username.value.trim())) {
+                statusEl.textContent = 'Kullanıcı adı 3–30 karakter olmalı, harfle başlamalı; harf/rakam/_ kullanılabilir.';
+                statusEl.className = 'status error';
+                return;
+            }
+
             if (!isEmail(email.value.trim())) {
                 statusEl.textContent = 'E-posta biçimi hatalı.';
                 statusEl.className = 'status error';

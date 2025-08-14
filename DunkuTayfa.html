@@ -141,7 +141,8 @@
         }
 
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="text"] {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid var(--border);
@@ -161,27 +162,71 @@
             box-shadow: var(--focus);
         }
 
+        /* --- ŞİFRE ALANI: BOZULMAYAN GÖSTER/GİZLE BUTONU --- */
         .password-wrap {
             position: relative;
+            /* Buton genişliği: hem masaüstü hem mobil için sabit tutuyoruz */
+            --toggle-w: 72px;
+            /* 'Gizle' uzunluğu baz alınarak */
+        }
+
+        /* Input'un sağ iç boşluğu buton genişliğine göre ayarlanır */
+        .password-wrap input#password {
+            padding-right: calc(var(--toggle-w) + 14px);
         }
 
         .toggle-pass {
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
+            right: 6px;
+            /* Üst-alt boşluk vererek input yüksekliğine müdahale etmeden içeride oturtuyoruz */
+            inset-block: 4px;
+            /* top & bottom */
             border: 0;
             background: transparent;
             font: inherit;
             color: var(--muted);
-            padding: 6px 8px;
+            padding: 0 8px;
             cursor: pointer;
             border-radius: 8px;
+            min-width: var(--toggle-w);
+            /* sabit görünür genişlik */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            white-space: nowrap;
+            /* satır kırma yok */
+            /* Box'a taşma yapmasın */
+            overflow: hidden;
+        }
+
+        /* Hover/focus stilleri */
+        .toggle-pass:hover {
+            color: var(--text);
         }
 
         .toggle-pass:focus-visible {
             box-shadow: var(--focus);
             outline: none;
+        }
+
+        /* Metni JS ile değiştirmek yerine CSS ile üretiyoruz: layout kayması yok */
+        .toggle-pass::before {
+            content: "Göster";
+        }
+
+        .toggle-pass[aria-pressed="true"]::before {
+            content: "Gizle";
+        }
+
+        /* Erişilebilirlik için yalnızca ekran okuyucuya */
+        .visually-hidden {
+            position: absolute !important;
+            height: 1px;
+            width: 1px;
+            overflow: hidden;
+            clip: rect(1px, 1px, 1px, 1px);
+            white-space: nowrap;
         }
 
         .actions {
@@ -394,8 +439,9 @@
 
         .spoke {
             animation: spoke var(--dur) linear infinite;
-            background: radial-gradient(100% 100% at center, hsl(0, 0%, 60%) 4.8%, hsla(0, 0%, 60%, 0) 5%),
-                linear-gradient(hsla(0, 0%, 55%, 0) 46.9%, hsl(0, 0%, 65%) 47% 52.9%, hsla(0, 0%, 65%, 0) 53%) 50% 50% / 99% 99% no-repeat;
+            background:
+                radial-gradient(100% 100% at center, hsl(0, 0%, 60%) 4.8%, hsla(0, 0%, 60%, 0) 5%),
+                linear-gradient(hsla(0, 0%, 55%, 0) 46.9%, hsl(0, 0%, 65%) 47% 52.9%, hsla(0, 0%, 65%, 0) 53%) 50% 50%/99% 99% no-repeat;
         }
 
         /* Animations */
@@ -635,7 +681,7 @@
                         placeholder="••••••••" required />
                     <button class="toggle-pass" type="button" id="togglePass" aria-controls="password"
                         aria-pressed="false" title="Şifreyi göster/gizle">
-                        Göster
+                        <span class="visually-hidden">Şifreyi göster veya gizle</span>
                     </button>
                 </div>
 
@@ -667,8 +713,8 @@
         togglePass.addEventListener('click', () => {
             const showing = passInput.type === 'text';
             passInput.type = showing ? 'password' : 'text';
+            // Sadece durum bilgisini güncelliyoruz; metin CSS ile yönetiliyor
             togglePass.setAttribute('aria-pressed', String(!showing));
-            togglePass.textContent = showing ? 'Göster' : 'Gizle';
             passInput.focus({ preventScroll: true });
         });
 
