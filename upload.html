@@ -34,14 +34,14 @@
         }
 
         * {
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         html,
         body {
             height: 100%;
             margin: 0;
-            padding: 0;
+            padding: 0
         }
 
         body {
@@ -54,7 +54,7 @@
                 var(--bg);
         }
 
-        /* ==== Sidebar (AnaSayfa ile aynı) ==== */
+        /* Sidebar */
         .sidebar {
             position: fixed;
             inset: auto auto 0 0;
@@ -70,7 +70,7 @@
             padding: 16px;
             transform: translateX(0);
             transition: transform .25s ease;
-            z-index: 50;
+            z-index: 50
         }
 
         .brand {
@@ -79,7 +79,7 @@
             gap: 10px;
             padding: 10px 8px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .08)
         }
 
         .brand .logo {
@@ -89,18 +89,18 @@
             background: rgba(255, 255, 255, .12);
             display: grid;
             place-items: center;
-            font-weight: 700;
+            font-weight: 700
         }
 
         .brand .title {
             margin: 0;
-            line-height: 1.2;
+            line-height: 1.2
         }
 
         .brand .subtitle {
             margin: 2px 0 0;
             font-size: 12px;
-            opacity: .85;
+            opacity: .85
         }
 
         .profile {
@@ -111,7 +111,7 @@
             padding: 8px;
             border-radius: 12px;
             background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .08)
         }
 
         .avatar {
@@ -120,29 +120,29 @@
             border-radius: 50%;
             object-fit: cover;
             background: #eee;
-            flex: 0 0 36px;
+            flex: 0 0 36px
         }
 
         .me {
             display: flex;
-            flex-direction: column;
+            flex-direction: column
         }
 
         .me .name {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 600
         }
 
         .me .mail {
             font-size: 12px;
-            opacity: .85;
+            opacity: .85
         }
 
         .nav {
             margin: 10px 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 6px
         }
 
         .nav a {
@@ -154,21 +154,21 @@
             text-decoration: none;
             color: #fff;
             border: 1px solid transparent;
-            transition: background .15s ease, transform .06s ease;
+            transition: background .15s ease, transform .06s ease
         }
 
         .nav a:hover {
             background: rgba(255, 255, 255, .08);
-            transform: translateY(1px);
+            transform: translateY(1px)
         }
 
         .nav a.active {
             background: rgba(255, 255, 255, .14);
-            border-color: rgba(255, 255, 255, .22);
+            border-color: rgba(255, 255, 255, .22)
         }
 
         .spacer {
-            flex: 1;
+            flex: 1
         }
 
         .signout-btn {
@@ -179,14 +179,13 @@
             background: rgba(255, 255, 255, .08);
             color: #fff;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 600
         }
 
         .signout-btn:hover {
-            background: rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .14)
         }
 
-        /* Mobile: off-canvas */
         .menu-toggle {
             position: fixed;
             top: 14px;
@@ -199,38 +198,38 @@
             border-radius: 10px;
             cursor: pointer;
             display: none;
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px)
         }
 
-        @media (max-width: 960px) {
+        @media (max-width:960px) {
             .menu-toggle {
-                display: block;
+                display: block
             }
 
             .sidebar {
-                transform: translateX(-100%);
+                transform: translateX(-100%)
             }
 
             .sidebar.open {
-                transform: translateX(0);
+                transform: translateX(0)
             }
         }
 
-        /* ==== Content ==== */
+        /* Content */
         .content {
             margin-left: var(--sidebar-w);
             padding: 24px;
             min-height: 100dvh;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: center
         }
 
         @media (max-width:960px) {
             .content {
                 margin-left: 0;
                 padding-top: 64px;
-                align-items: flex-start;
+                align-items: flex-start
             }
         }
 
@@ -241,34 +240,34 @@
             box-shadow: var(--shadow);
             width: 100%;
             max-width: 720px;
-            padding: 20px;
+            padding: 20px
         }
 
         .upload-card header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 10px
         }
 
         .upload-card h2 {
             margin: 0 0 6px;
-            font-size: 22px;
+            font-size: 22px
         }
 
         .upload-card p {
             margin: 0;
-            color: var(--muted);
+            color: var(--muted)
         }
 
         .form {
             display: grid;
             grid-template-columns: 1fr;
             gap: 14px;
-            margin-top: 14px;
+            margin-top: 14px
         }
 
         label {
             font-size: 14px;
-            color: var(--muted);
+            color: var(--muted)
         }
 
         input[type="text"] {
@@ -279,12 +278,12 @@
             background: transparent;
             color: inherit;
             transition: box-shadow .15s ease, border-color .15s ease;
-            outline: none;
+            outline: none
         }
 
         input[type="text"]:focus {
             border-color: var(--accent);
-            box-shadow: var(--focus);
+            box-shadow: var(--focus)
         }
 
         .dropzone {
@@ -293,29 +292,29 @@
             padding: 18px;
             text-align: center;
             background: #f8fafc;
-            color: #0f172a;
+            color: #0f172a
         }
 
-        @media (prefers-color-scheme: dark) {
+        @media (prefers-color-scheme:dark) {
             .dropzone {
                 background: #0f1d20;
-                color: #e6edf3;
+                color: #e6edf3
             }
         }
 
         .dropzone.drag {
             border-color: var(--accent);
-            background: rgba(14, 165, 233, .08);
+            background: rgba(14, 165, 233, .08)
         }
 
         .dropzone input {
-            display: none;
+            display: none
         }
 
         .dropzone .hint {
             color: var(--muted);
             font-size: 13px;
-            margin-top: 6px;
+            margin-top: 6px
         }
 
         .preview {
@@ -326,24 +325,24 @@
             border: 1px dashed var(--border);
             border-radius: 12px;
             padding: 10px;
-            background: rgba(2, 6, 23, .02);
+            background: rgba(2, 6, 23, .02)
         }
 
         .preview img {
             max-width: 100%;
             border-radius: 10px;
-            display: block;
+            display: block
         }
 
         .file-info {
             font-size: 13px;
-            color: var(--muted);
+            color: var(--muted)
         }
 
         .actions {
             display: grid;
             gap: 10px;
-            margin-top: 6px;
+            margin-top: 6px
         }
 
         .btn {
@@ -358,58 +357,57 @@
             color: #fff;
             font-weight: 700;
             cursor: pointer;
-            transition: transform .06s ease, background .15s ease;
+            transition: transform .06s ease, background .15s ease
         }
 
         .btn:hover {
-            background: var(--accent-pressed);
+            background: var(--accent-pressed)
         }
 
         .btn:active {
-            transform: translateY(1px);
+            transform: translateY(1px)
         }
 
         .btn[disabled] {
             opacity: .7;
-            cursor: not-allowed;
+            cursor: not-allowed
         }
 
         .ghost {
-            background: #6c757d;
+            background: #6c757d
         }
 
         .ghost:hover {
-            filter: brightness(1.05);
+            filter: brightness(1.05)
         }
 
         .status {
             min-height: 22px;
             font-size: 14px;
-            color: var(--muted);
+            color: var(--muted)
         }
 
         .status.error {
-            color: var(--err);
+            color: var(--err)
         }
 
         .status.ok {
-            color: var(--ok);
+            color: var(--ok)
         }
 
         /* "Yükle" butonunu belirginleştir */
         #uploadBtn {
             background: #22c55e;
-            /* yeşil */
             border-color: transparent;
-            box-shadow: 0 6px 18px rgba(34, 197, 94, .35);
+            box-shadow: 0 6px 18px rgba(34, 197, 94, .35)
         }
 
         #uploadBtn:hover {
-            background: #16a34a;
+            background: #16a34a
         }
 
         #uploadBtn:active {
-            transform: translateY(1px);
+            transform: translateY(1px)
         }
     </style>
 </head>
@@ -517,7 +515,7 @@
             document.getElementById('meName').textContent = me.email?.split('@')[0] || 'Kullanıcı';
             document.getElementById('meMail').textContent = me.email || '';
             const avEl = document.getElementById('meAvatar');
-            avEl.style.display = 'none'; // avatar kullanmıyorsak gizle
+            avEl.style.display = 'none';
             box.hidden = false;
         })();
 
@@ -552,7 +550,7 @@
             reader.readAsDataURL(file);
             fileInfo.textContent = `${file.name} - ${(file.size / 1024 / 1024).toFixed(2)} MB`;
             if (!titleInput.value.trim()) {
-                const base = file.name.replace(/\\.[^.]+$/, '');
+                const base = file.name.replace(/\.[^.]+$/, '');
                 titleInput.value = base;
             }
         }

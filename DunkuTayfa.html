@@ -166,21 +166,22 @@
         .password-wrap {
             position: relative;
             /* Buton genişliği: hem masaüstü hem mobil için sabit tutuyoruz */
-            --toggle-w: 72px;
+            --toggle-w: 60px;
             /* 'Gizle' uzunluğu baz alınarak */
         }
 
         /* Input'un sağ iç boşluğu buton genişliğine göre ayarlanır */
         .password-wrap input#password {
-            padding-right: calc(var(--toggle-w) + 14px);
+            padding-right: calc(var(--toggle-w) + 10px);
         }
 
         .toggle-pass {
             position: absolute;
             right: 6px;
-            /* Üst-alt boşluk vererek input yüksekliğine müdahale etmeden içeride oturtuyoruz */
-            inset-block: 4px;
-            /* top & bottom */
+            top: 50%;
+            transform: translateY(0%);
+            height: 32px;
+            /* input yüksekliğine göre ayarlanabilir */
             border: 0;
             background: transparent;
             font: inherit;
@@ -189,14 +190,11 @@
             cursor: pointer;
             border-radius: 8px;
             min-width: var(--toggle-w);
-            /* sabit görünür genişlik */
             display: inline-flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
             white-space: nowrap;
-            /* satır kırma yok */
-            /* Box'a taşma yapmasın */
             overflow: hidden;
         }
 
