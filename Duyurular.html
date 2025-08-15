@@ -383,8 +383,13 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             box-shadow: var(--shadow);
-            padding: 12px
+            padding: 12px;
+            display: inline-block;
+            /* veya block, ama height:auto olması önemli */
+            height: auto;
+            /* sabit yükseklik olmasın */
         }
+
 
         .item h3 {
             margin: 0 0 6px;
@@ -402,8 +407,9 @@
         .item .content {
             white-space: pre-wrap;
             line-height: 1.55;
-            margin-top: 8px
+            margin-top: 8px;
         }
+
 
         .item .item-actions {
             display: flex;
