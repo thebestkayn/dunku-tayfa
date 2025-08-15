@@ -958,32 +958,33 @@
 
             loadingEl.style.display = 'none';
             if (error) { grid.innerHTML = '<p>Fotoğraflar yüklenirken hata oluştu.</p>'; return; }
-            if (!data || data.length === 0) { grid.innerHTML = '<p>Henüz fotoğraf yüklemediniz.</p>'; return; }
-
             grid.innerHTML = '';
-            for (const photo of data) {
-                const [{ count: likeCount }, { count: commentCount }] = await Promise.all([
-                    supabase.from('likes').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
-                    supabase.from('comments').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
-                ]);
-
-                const card = document.createElement('div');
-                card.className = 'album-card';
-                card.id = `photo-${photo.id}`;
-                card.innerHTML = `
-          <img src="${photo.image_url}" alt="${photo.title || 'Başlıksız'}">
-          <div class="caption">${photo.title || 'Başlıksız'}</div>
-          <div class="badges">
-            <span class="badge">❤️ <span>${likeCount || 0}</span></span>
-            <span class="badge">💬 <span>${commentCount || 0}</span></span>
-          </div>
-          <div class="actions">
-            <button class="del-btn" data-id="${photo.id}">Sil</button>
-          </div>
-        `;
-                (card.querySelector('.caption') || {}).textContent = (photo.title ?? 'Başlıksız');
-                card.querySelector('.del-btn').addEventListener('click', async () => { await deletePhoto(photo); });
-                grid.appendChild(card);
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<p>Henüz fotoğraf yüklemediniz.</p>';
+            } else {
+                for (const photo of data) {
+                    const [{ count: likeCount }, { count: commentCount }] = await Promise.all([
+                        supabase.from('likes').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
+                        supabase.from('comments').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
+                    ]);
+                    const card = document.createElement('div');
+                    card.className = 'album-card';
+                    card.id = `photo-${photo.id}`;
+                    card.innerHTML = `
+                            <img src="${photo.image_url}" alt="${photo.title || 'Başlıksız'}">
+                            <div class="caption">${photo.title || 'Başlıksız'}</div>
+                            <div class="badges">
+                                <span class="badge">❤️ <span>${likeCount || 0}</span></span>
+                                <span class="badge">💬 <span>${commentCount || 0}</span></span>
+                            </div>
+                            <div class="actions">
+                                <button class="del-btn" data-id="${photo.id}">Sil</button>
+                            </div>
+                        `;
+                    (card.querySelector('.caption') || {}).textContent = (photo.title ?? 'Başlıksız');
+                    card.querySelector('.del-btn').addEventListener('click', async () => { await deletePhoto(photo); });
+                    grid.appendChild(card);
+                }
             }
 
             // ==== Kullanıcı adı düzenleme UI ====
